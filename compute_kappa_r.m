@@ -1,5 +1,7 @@
 function [output,varargout] = compute_kappa_r(Cnat_monthly,tmp_monthly,verbosity,varargin)
+
 n_vargin = numel(varargin);
+n_vargout = nargout - 1;
 
 if n_vargin & n_vargin ~= 1
     warning('If entering 4 inputs, must specify scale factor');
@@ -36,10 +38,14 @@ if size(tmp_monthly) ~= size(Cnat_monthly)
     error('Carbon, Temperature vectors must be the same size. Error in monthly data.')
 end
 
-if verbosity &  isempty(find(~isnan(tmp_monthly))) & isempty(find(~isnan(Cnat_monthly)))
-    disp('Temperature and Cnat vectors are all NaN. Assigning NaN output');
+if ~any(~isnan(tmp_monthly)) & ~any(~isnan(Cnat_monthly))
+    if verbosity
+        disp('Temperature and Cnat vectors are all NaN. Assigning NaN output');
+    end
     output = NaN;
-    varargout{1} = NaN;
+    for i = 1:n_vargout
+        varargout{i} = NaN;
+    end
     return
 end
 
@@ -109,6 +115,7 @@ if ~isnan (coeff)
             output = grad;
             varargout{1} = sqrt(1 - (basis(4)./basis(1))^2);
         elseif strcmpi(varargin{1},'both')
+            output = grad;
             varargout{1} = 1 - 4*det(basis);
             varargout{2} = sqrt(1 - (basis(4)./basis(1))^2);
             if verbosity
@@ -122,7 +129,9 @@ if ~isnan (coeff)
     end
 else 
     output = NaN;
-    varargout{1} = NaN;
+	for i = 1:n_vargout
+    	varargout{i} = NaN;
+	end
 end
 
 end
