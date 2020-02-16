@@ -1,14 +1,34 @@
-function [output,varargout] = compute_kappa_r(Cnat_monthly,tmp_monthly,verbosity,varargin)
+function [output,varargout] = compute_kappa_r(Cnat_timeseries,tmp_timeseries,verbosity,periodicity,varargin)
 
 n_vargin = numel(varargin);
 n_vargout = nargout - 1;
 
-if n_vargin & n_vargin ~= 1
-    warning('If entering 4 inputs, must specify scale factor');
-    error('Only 3 or 4 outputs can be entered');
+if n_vargin & n_vargin > 1
+    error('Only 3 to 5 inputs can be entered');
 elseif n_vargin == 0 & verbosity
     disp('No scale factor specified. Defaulting to determinant');
 end
+
+if isempty(periodicity)
+    if verbosity
+        disp('No periodicity specified. Assuming you want to use monthly data.')
+        disp('Setting periodicity = 12');
+    end
+    periodicity = 12;
+end
+
+% This next condition should (touch wood) build in backwards compatability
+% with previous fixed periodicity versions of the code.
+
+if ~isnumeric(periodicity) | length(periodicity) ~=1
+    if verbosity
+        disp('Periodicity is not a number. Assuming backwards compatability cockup');
+        disp('Assuming you want to use monthly data and setting periodicity = 12');
+    end
+    periodicity = 12;
+end
+
+
 
 if n_vargin == 1
     if ~strcmpi(varargin{1},'det') & ~strcmpi(varargin{1}, 'ecc') & ~strcmpi(varargin{1}, 'both')
@@ -18,27 +38,28 @@ if n_vargin == 1
     end
 end
 
-Cnat_monthly = squeeze(Cnat_monthly); % Make sure we don't have extraneous dimensions
-tmp_monthly = squeeze(tmp_monthly); % Make sure we don't have extraneous dimensions
 
-if ~isvector(tmp_monthly) | ~isvector(Cnat_monthly)
+Cnat_timeseries = squeeze(Cnat_timeseries); % Make sure we don't have extraneous dimensions
+tmp_timeseries = squeeze(tmp_timeseries); % Make sure we don't have extraneous dimensions
+
+if ~isvector(tmp_timeseries) | ~isvector(Cnat_timeseries)
     error('Carbon, Temperature data must be vectors. Error in monthly data');
 end
 
-if size(Cnat_monthly,2) ~= 1
-    Cnat_monthly = Cnat_monthly'; % Make sure input data is a column vector
+if size(Cnat_timeseries,2) ~= 1
+    Cnat_timeseries = Cnat_timeseries'; % Make sure input data is a column vector
 end
 
-if size(tmp_monthly,2) ~= 1
-    tmp_monthly = tmp_monthly'; % Make sure input data is a column vector
+if size(tmp_timeseries,2) ~= 1
+    tmp_timeseries = tmp_timeseries'; % Make sure input data is a column vector
 end
 
 
-if size(tmp_monthly) ~= size(Cnat_monthly)
+if size(tmp_timeseries) ~= size(Cnat_timeseries)
     error('Carbon, Temperature vectors must be the same size. Error in monthly data.')
 end
 
-if ~any(~isnan(tmp_monthly)) & ~any(~isnan(Cnat_monthly))
+if ~any(~isnan(tmp_timeseries)) & ~any(~isnan(Cnat_timeseries))
     if verbosity
         disp('Temperature and Cnat vectors are all NaN. Assigning NaN output');
     end
@@ -49,26 +70,23 @@ if ~any(~isnan(tmp_monthly)) & ~any(~isnan(Cnat_monthly))
     return
 end
 
-if nanmean(Cnat_monthly < 50) & nanmean(tmp_monthly > 1500)
-   [Cnat_monthly,tmp_monthly] = deal(tmp_monthly,Cnat_monthly);
+if nanmean(Cnat_timeseries < 50) & nanmean(tmp_timeseries > 1500)
+   [Cnat_timeseries,tmp_timeseries] = deal(tmp_timeseries,Cnat_timeseries);
    if verbosity
        disp("Tmp, Cnat seem to be misplaced. Switching")
    end
 end
 
-nan_idx = find(isnan(tmp_monthly) | isnan(Cnat_monthly));
+nan_idx = find(isnan(tmp_timeseries) | isnan(Cnat_timeseries));
 if nan_idx
-    tmp_monthly(nan_idx) = 0;
-    Cnat_monthly(nan_idx) = 0;
+    tmp_timeseries(nan_idx) = 0;
+    Cnat_timeseries(nan_idx) = 0;
 end
 
 
-high_frequency_tmp = compute_high_frequencies(tmp_monthly,verbosity);
-high_frequency_Cnat = compute_high_frequencies(Cnat_monthly,verbosity);
+high_frequency_tmp = compute_high_frequencies(tmp_timeseries,periodicity,verbosity);
+high_frequency_Cnat = compute_high_frequencies(Cnat_timeseries,periodicity,verbosity);
 
-
-low_frequency_Cnat = Cnat_monthly - high_frequency_Cnat;
-low_frequency_tmp = tmp_monthly - high_frequency_tmp;
 
 
 % In some cases (ie. drift correction), we expect to see a period (ie.
@@ -137,19 +155,20 @@ end
 end
 
 
-function [output] = compute_high_frequencies(input,verbosity)
+function [output] = compute_high_frequencies(input,periodicity,verbosity)
 
-n_years = floor(length(input)/12);
-if floor(length(input))/12 ~= length(input)/12
-    n = length(input)/12 - floor(length(input))/12;
+n_cycles = floor(length(input)/periodicity);
+if floor(length(input))/periodicity ~= length(input)/periodicity
+    n = length(input)/periodicity - floor(length(input))/periodicity;
     if verbosity
-        warning(['Input not given for integer number of years. Ignoring last ',num2str(n),' data points']);
+        warning(['Input not given for integer number of cycles. Ignoring last ',num2str(n),' data points']);
     end
 end
 
-output = NaN(12*n_years,1);
-for i = 1:n_years
-    output(12*i-11:12*i) = input(12*i-11:12*i) - repmat(nanmean(input(12*i-11:12*i)),[12 1]);
+output = NaN(periodicity*n_cycles,1);
+for i = 1:n_cycles
+    output(periodicity*i-periodicity+1:periodicity*i) = input(periodicity*i-periodicity+1:periodicity*i) ...
+        - repmat(nanmean(input(periodicity*i-periodicity+1:periodicity*i)),[periodicity 1]);
 end
 
 end
