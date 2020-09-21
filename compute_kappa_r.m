@@ -1,5 +1,19 @@
 function [output,varargout] = compute_kappa_r(Cnat_timeseries,tmp_timeseries,verbosity,periodicity,varargin)
 
+% Cnat_timeseries and tmp_timeseries must be vectors of the same length. This function will only work 
+% out kappa_r at a single point for each call.
+% verbosity must be either 1 or 0. Setting verbosity = 1 will give you a lot of feedback about what 
+% the function is doing, setting 0 will result in no feedback. This is handy when running a lot of 
+% points.
+% periodicity can be set to whatever you like, but the standard usage I've been following is to set
+% it to 12 if using monthly model data or 10 if using decadal data. It will determine how to block up 
+% the timeseries to remove a mean from each value. Ie if you set periodicity = 12 with monthly data, 
+% the timeseries will be blocked into years, and the yearly mean of each year removed to give monthly 
+% - yearly mean data.
+% varargin: must be 'det', 'ecc', or 'both'. If not specified, it will default to 'det'. This allows
+% you to specify what kind of scaling factor is applied to account for fit uncertainty: determinant 
+% or eccentricity. These are given as separate outputs.
+
 n_vargin = numel(varargin);
 n_vargout = nargout - 1;
 
