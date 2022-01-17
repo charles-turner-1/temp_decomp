@@ -17,6 +17,10 @@ function [output,varargout] = compute_kappa_r(Cnat_timeseries,tmp_timeseries,ver
 n_vargin = numel(varargin);
 n_vargout = nargout - 1;
 
+if n_vargin & ~n_vargout
+    warning('You have specified to return kappa_r and a scale factor, but function is only returning kappa_r. This is likely to cause confusion');
+end
+
 if n_vargin & n_vargin > 1
     error('Only 3 to 5 inputs can be entered');
 elseif n_vargin == 0 & verbosity
@@ -45,15 +49,15 @@ end
 
 
 if n_vargin == 1
-    if ~strcmpi(varargin{1},'det') & ~strcmpi(varargin{1}, 'ecc') & ~strcmpi(varargin{1}, 'both')
-        disp('Scale factor must be eccentricity, determinant or both');
-        disp("Enter 'det' for determinant, 'ecc' for eccentricity, 'both' for both")
+    if  ~strcmpi(varargin{1}, 'ecc') 
+        disp('If varargin specified, scale factor must be eccentricity');
+        disp("Specify varargin == 'ecc' for eccentricity output")
         error('Scale factor specified incorrectly');
     end
 end
 
 
-Cnat_timeseries = squeeze(Cnat_timeseries); % Make sure we don't have extraneous dimensions
+Cnat_timeseries = squeeze(Cnat_timeseries); % Make sure we don't have extraneous dimensions 
 tmp_timeseries = squeeze(tmp_timeseries); % Make sure we don't have extraneous dimensions
 
 if ~isvector(tmp_timeseries) | ~isvector(Cnat_timeseries)
@@ -105,7 +109,7 @@ high_frequency_Cnat = compute_high_frequencies(Cnat_timeseries,periodicity,verbo
 
 % In some cases (ie. drift correction), we expect to see a period (ie.
 % 30yrs) of temperature and Cnat being zero. Removing these has no effect
-% as I've used PCA, but chuck out an error message.
+% as I've used PCA, but chuck out an warning anyway.
 
 nanlist = find(high_frequency_Cnat==0 & high_frequency_tmp==0);
 high_frequency_Cnat(nanlist) = [];
@@ -140,25 +144,12 @@ if ~isnan (coeff)
     basis(1,1) = explainedZ(1)./100;
     basis(2,2) = explainedZ(2)./100;
     if n_vargin
-        if strcmpi(varargin{1},'det')
-            output = grad;
-            varargout{1} = 1 - 4*det(basis);
-        elseif strcmpi(varargin{1},'ecc')
-            output = grad;
-            varargout{1} = sqrt(1 - (basis(4)./basis(1))^2);
-        elseif strcmpi(varargin{1},'both')
-            output = grad;
-            varargout{1} = 1 - 4*det(basis);
-            varargout{2} = sqrt(1 - (basis(4)./basis(1))^2);
-            if verbosity
-                disp('Output argument 1: Kappa_r');
-                disp('Output argument 2: Determinant');
-                disp('Output argument 3: Eccentricity');
-            end
-        end
-    else
-        output = grad.*(1 - 4*det(basis));
-    end
+		output = grad;
+		varargout{1} = sqrt(1 - (basis(4)./basis(1))^2);
+       	if verbosity
+       	    disp('Output argument 1: Kappa_r');
+       	    disp('Output argument 2: Eccentricity');
+       	end
 else 
     output = NaN;
 	for i = 1:n_vargout
@@ -180,9 +171,9 @@ if floor(length(input))/periodicity ~= length(input)/periodicity
 end
 
 output = NaN(periodicity*n_cycles,1);
-for i = 1:n_cycles
-    output(periodicity*i-periodicity+1:periodicity*i) = input(periodicity*i-periodicity+1:periodicity*i) ...
-        - repmat(nanmean(input(periodicity*i-periodicity+1:periodicity*i)),[periodicity 1]);
-end
+		for i = 1:n_cycles
+		    output(periodicity*i-periodicity+1:periodicity*i) = input(periodicity*i-periodicity+1:periodicity*i) ...
+		        - repmat(nanmean(input(periodicity*i-periodicity+1:periodicity*i)),[periodicity 1]);
+		end
 
 end
