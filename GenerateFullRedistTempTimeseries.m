@@ -1,23 +1,28 @@
-% I need to generate the 362x292x64x240 timeseries of redistributed
-% temperature. This is going to be a pain in the ass. To do this, I first
-% need to create a drift controlled Cnat change file.
+% This file generates either the full 240 year timeseries of redistributed
+% temperature (uses full 240 year fields, lines 11-20, data available upon
+% request), or will generate a sample redistributed temperature field using
+% 2090-2099 mean Cnat change from preindustrial and mean Canth global
+% fields over the same period.
 
-load('/home/ct/MATLAB/BIGMATFILES/DIC_RAD.mat');
-load('/home/ct/MATLAB/BIGMATFILES/DIC_CTR.mat');
+load('./GBL_Carbon_Example_Data.mat')
+dCnat = dCnat_example; clear dCnat_example
+dCanth = dCanth_example; clear dCanth_example
 
-dCnat = DIC_RAD - DIC_CTR;
-clear DIC_CTR
+%load('/home/ct/MATLAB/BIGMATFILES/DIC_RAD.mat');
+%load('/home/ct/MATLAB/BIGMATFILES/DIC_CTR.mat');
+
+%dCnat = DIC_RAD - DIC_CTR;
+%clear DIC_CTR
 % Now we need to get dCanth too.
 
-load('/home/ct/MATLAB/BIGMATFILES/DIC_COU.mat');
-dCanth = DIC_COU - DIC_RAD;
-clear DIC_COU DIC_RAD
+%load('/home/ct/MATLAB/BIGMATFILES/DIC_COU.mat');
+%dCanth = DIC_COU - DIC_RAD;
+%clear DIC_COU DIC_RAD
 
 % Now load kappa_r values in. This .mat file also contains polynomial fits
 % which were used as a sanity check.
-% % This file is generated in
-% /home/ct/MATLAB/2020/November/TestingShortAndLongTermGlobalOcean.m
-load('/home/ct/MATLAB/2020/November/KappaRandPolyfitTest.mat','kappa_r','ecc');
+% This file is generated in TestingShortAndLongTermGlobalOcean.m
+load('./KappaRandPolyfitTest.mat','kappa_r','ecc');
 kappa_r = kappa_r .* ecc;
 
 % Now, we have our kappa_r table. We need to use dCanth and dCnat
@@ -25,21 +30,27 @@ kappa_r = kappa_r .* ecc;
 
 %%  The following 5 lines generate the globalGammaVals list. Note everything
 %  is turned into a single in order to use a parfor loop: otherwise we run
-%  out of memory on my machine and crash matlab.
+%  out of memory on my machine and crash matlab. N.B: only applicable for
+%  the full, 240 year runs.
 dCnat = single(dCnat);
 dCanth = single(dCanth);
 %
 gammaValuesTemp = calculateGammaValue(dCnat,dCanth,kappa_r,1);
 gammaValuesCarbon = calculateGammaValue(dCnat,dCanth,kappa_r,0);
-save globalGammaValsYEARLYCTR.mat gammaValues                     
+% save gammaVals.mat gammaValues                     
 
-%% Load it instead of generating it again, if rerunning this script
-load globalGammaValsYEARLYCTR.mat
+%% Load it instead of generating it again, if rerunning this script. This will require uncommenting line 40 to save output and full fields
+% load gammaVals.mat
+gammaValues = gammaValuesTemp;
+% This code block will plot out the gamma factor and then build the global
+% adjusted Cnat field. It will require the full 240 years fields in order
+% to run properly, or it will generate a single adjusted Cnat field, which
+% is the 2090-2099 decadal mean Cnat field.
 
 %
 load grid_data_areas_masks.mat dV;
 
-dV = repmat(dV,[1 1 1 240]);
+dV = repmat(dV,[1 1 1 size(dCanth,4)]);
 
 gblCanthInv = squeeze(nansum(nansum(nansum(dCanth .* dV,1),2),3));
 
@@ -74,7 +85,7 @@ smoothedGammaValues = smooth(gammaValues,10,'rloess');
 % Now build the adjusted Cnat field
 
 
-AdjCnat = dCnat + permute(repmat(smoothedGammaValues,[1 362 292 64]), [2 3 4 1]) .* dCanth;
+AdjCnat = dCnat + squeeze(permute(repmat(smoothedGammaValues,[1 362 292 64]), [2 3 4 1])) .* dCanth;
 
 %% And save it off
 
