@@ -137,25 +137,26 @@ end
 % Just send the problematic cases to NaN and then deal with them in the
 % following isnan case
 
-if ~isnan (coeff) 
+if ~isnan (coeff)
     basis = zeros(2);
     grad = coeff(2,1)./coeff(1,1);
     basis(1,1) = explainedZ(1)./100;
     basis(2,2) = explainedZ(2)./100;
     if n_vargin
-		output = grad;
-		varargout{1} = sqrt(1 - (basis(4)./basis(1))^2);
-       	if verbosity
-       	    disp('Output argument 1: Kappa_r');
-       	    disp('Output argument 2: Eccentricity');
-       	end
-else 
-    output = NaN;
-	for i = 1:n_vargout
-    	varargout{i} = NaN;
-	end
+        output = grad;
+        varargout{1} = sqrt(1 - (basis(4)./basis(1))^2);
+        if verbosity
+            disp('Output argument 1: Kappa_r');
+            disp('Output argument 2: Eccentricity');
+        end
+    else
+        output = NaN;
+        for i = 1:n_vargout
+            varargout{i} = NaN;
+        end
+    end
+    
 end
-
 end
 
 
