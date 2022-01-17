@@ -10,9 +10,8 @@ function [output,varargout] = compute_kappa_r(Cnat_timeseries,tmp_timeseries,ver
 % the timeseries to remove a mean from each value. Ie if you set periodicity = 12 with monthly data, 
 % the timeseries will be blocked into years, and the yearly mean of each year removed to give monthly 
 % - yearly mean data.
-% varargin: must be 'det', 'ecc', or 'both'. If not specified, it will default to 'det'. This allows
-% you to specify what kind of scaling factor is applied to account for fit uncertainty: determinant 
-% or eccentricity. These are given as separate outputs.
+% varargin: If specified, must be 'ecc'. If not specified, no scaling factor will be returned in varargout. 
+% This allows you to return a scaling factor which accounts for fit uncertainty.
 
 n_vargin = numel(varargin);
 n_vargout = nargout - 1;
