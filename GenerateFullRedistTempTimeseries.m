@@ -8,16 +8,16 @@ load('./GBL_Carbon_Example_Data.mat')
 dCnat = dCnat_example; clear dCnat_example
 dCanth = dCanth_example; clear dCanth_example
 
-load('/home/ct/MATLAB/BIGMATFILES/DIC_RAD.mat');
-load('/home/ct/MATLAB/BIGMATFILES/DIC_CTR.mat');
-
-dCnat = DIC_RAD - DIC_CTR;
-clear DIC_CTR
-% Now we need to get dCanth too.
-
-load('/home/ct/MATLAB/BIGMATFILES/DIC_COU.mat');
-dCanth = DIC_COU - DIC_RAD;
-clear DIC_COU DIC_RAD
+% %load('/home/ct/MATLAB/BIGMATFILES/DIC_RAD.mat');
+% %load('/home/ct/MATLAB/BIGMATFILES/DIC_CTR.mat');
+% 
+% %dCnat = DIC_RAD - DIC_CTR;
+% %clear DIC_CTR
+% % Now we need to get dCanth too.
+% 
+% %load('/home/ct/MATLAB/BIGMATFILES/DIC_COU.mat');
+% %dCanth = DIC_COU - DIC_RAD;
+% %clear DIC_COU DIC_RAD
 
 % Now load kappa_r values in. This .mat file also contains polynomial fits
 % which were used as a sanity check.
@@ -40,8 +40,7 @@ gammaValuesCarbon = calculateGammaValue(dCnat,dCanth,kappa_r,0);
 %save gammaVals.mat gammaValues                     
 
 %% Load it instead of generating it again, if rerunning this script. This will require uncommenting line 40 to save output and full fields
-load gammaValuess.mat
-gammaValues = gammaValues;
+load gammaValues.mat
 % This code block will plot out the gamma factor and then build the global
 % adjusted Cnat field. It will require the full 240 years fields in order
 % to run properly, or it will generate a single adjusted Cnat field, which
@@ -79,7 +78,7 @@ ax2.YColor =  'red';
 % Save this
 
 smoothedGammaValues = smooth(gammaValues,10,'rloess');
-save gammaValues.mat gammaValues smoothedGammaValues
+%save gammaValues.mat gammaValues smoothedGammaValues
 
 
 % Now build the adjusted Cnat field
@@ -120,7 +119,7 @@ ylabel('OHC (Redistributed) / ZJ');
 
 legend({'$\int \Delta \Theta_r dV$','$\int | \Delta \Theta_r| dV$'},'interpreter','latex');
 
-%% Looks about right if you ask me. Now build the excess temperature field.
+%% Now build the excess temperature field.
 clear AdjCnat
 
 load('/home/ct/MATLAB/BIGMATFILES/TMP_COU.mat');
@@ -164,10 +163,6 @@ ylabel('OHC (Redistributed) / ZJ');
 legend({'$\int \Delta \Theta_e dV$','$\int \Delta \Theta_r dV$','$\int | \Delta \Theta_r| dV$'},'interpreter','latex');
 
 
-
-
-% This all looks like it has worked pretty well. In summary, I'm actually
-% pretty happy with how its panned out.
 
 
 
