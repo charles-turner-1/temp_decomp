@@ -1,5 +1,5 @@
 % This script will generate a kappa_r value for each point in the ORCA1
-% grid as well as a polynomial fit value at each point which maybe be used
+% grid as well as a polynomial fit value at each point which may be used
 % as a sanity check
 
 
