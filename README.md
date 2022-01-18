@@ -5,7 +5,7 @@ It also contains a number of scripts which will generate sample fields as a supp
 
 .mat files contain sample data: these have been restricted to a single point in time for the gamma calculation and an array of grid cells approximating the location of the real world RAPID array for the full 240 year time series due to file size contraints. Please contact me if you wish to run the sample analyses on the full dataset.
 * `KappaRandPolyfit.mat` contains a global Kr field, along with ordinary least squares fits of dT/dCnat at each point. These fields are generated in the script `computeGlobalappaRValues.m`.
-* RAPID_TMP_DIC_Fields.mat contains temperature and DIC (along with decomposed components) at the location of the RAPID array. The full global fields are generated in the script `GenerateFullRedistTempTimeseries.m`. The location of the RAPID array is then selected by the function globalToRapid.
+* `RAPID_TMP_DIC_Fields.mat` contains temperature and DIC (along with decomposed components) at the location of the RAPID array. The full global fields are generated in the script `GenerateFullRedistTempTimeseries.m`. The location of the RAPID array is then selected by the function globalToRapid.
 * `gammaValues.mat` contains the gamma values presented in Figure A1, which are used to adjust Cnat to correct for outgassing. A sample gamma value, for the 2090-2099 decadal mean gamma value, is produced in `GenerateFullRedistTempTimeseries.m`. Generating the full timeseries will require the full, 4D fields.
 * `grid_data_areas_masks.mat` contains data pertaining to the ORCA1 grid: longitudes, latitudes,grid cell volumes, masks for ocean basins, etc.
 * `section_location_76pt.mat` contains data identifying the location of the RAPID array.
