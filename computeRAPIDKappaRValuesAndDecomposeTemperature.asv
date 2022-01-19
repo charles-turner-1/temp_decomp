@@ -2,9 +2,7 @@
 % (available upon request), and selects a section which approximates the
 % location of the RAPID array. It will then use 100 years of control run
 % data in order to generate a kappa_r field, as well as loading this
-% section directly from computed values. Running directly from the second
-% code block will instead load the RAPID only fields and perform all
-% analysis from that point.
+% section directly from computed values.
 
 load('/home/ct/MATLAB/BIGMATFILES/DIC_RAD.mat');
 load('/home/ct/MATLAB/BIGMATFILES/DIC_CTR.mat');
@@ -38,8 +36,8 @@ load RAPID_TMP_DIC_Fields.mat
 % Now load kappa_r values in. This .mat file also contains polynomial fits
 % which were used as a sanity check.
 % This file is generated in TestingShortAndLongTermGlobalOcean.m
-load('./KappaRandPolyfit.mat','kappa_i','ecc');
-kappa_r = kappa_i .* ecc;
+load('./KappaRandPolyfit.mat','kappa_s','ecc');
+kappa_r = kappa_s .* ecc;
 kappa_r = globalToRapid(kappa_r);
 
 %
@@ -59,7 +57,7 @@ for i = 1:76
     end
     fprintf('Done on longitude box %d\n',i);
 end
-kappa_r_Calculated = kappa_i_Calculated .* ecc_Calculated;
+kappa_r_Calculated = kappa_s_Calculated .* ecc_Calculated;
 % Show that the calculated and saved versions are the same
 
 pcolor(kappa_r - kappa_r_Calculated); shading flat

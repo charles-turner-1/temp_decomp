@@ -36,13 +36,13 @@ load RAPID_TMP_DIC_Fields.mat
 % Now load kappa_r values in. This .mat file also contains polynomial fits
 % which were used as a sanity check.
 % This file is generated in TestingShortAndLongTermGlobalOcean.m
-load('./KappaRandPolyfit.mat','kappa_s','ecc');
-kappa_r = kappa_s .* ecc;
+load('./KappaRandPolyfit.mat','kappa_i','ecc');
+kappa_r = kappa_i .* ecc;
 kappa_r = globalToRapid(kappa_r);
 
 %
 
-kappa_s_Calculated = NaN(76,64);
+kappa_i_Calculated = NaN(76,64);
 ecc_Calculated = NaN(76,64);
 p1Vals_Calculated = NaN(76,64);
 
@@ -51,13 +51,13 @@ for i = 1:76
     for j = 1:64
             x = squeeze(DIC_CTR(i,j,1:240));
             y = squeeze(TMP_CTR(i,j,1:240));
-            [kappa_s_Calculated(i,j),ecc_Calculated(i,j)] = compute_kappa_r(x,y,0,10,'ecc');
+            [kappa_i_Calculated(i,j),ecc_Calculated(i,j)] = compute_kappa_r(x,y,0,10,'ecc');
             p1 = polyfit(x,y,1);
             p1Vals_Calculated(i,j) = p1(1);
     end
     fprintf('Done on longitude box %d\n',i);
 end
-kappa_r_Calculated = kappa_s_Calculated .* ecc_Calculated;
+kappa_r_Calculated = kappa_i_Calculated .* ecc_Calculated;
 % Show that the calculated and saved versions are the same
 
 pcolor(kappa_r - kappa_r_Calculated); shading flat
