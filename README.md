@@ -9,6 +9,7 @@ It also contains a number of scripts which will generate sample fields as a supp
 * `gammaValues.mat` contains the gamma values presented in Figure A1, which are used to adjust Cnat to correct for outgassing. A sample gamma value, for the 2090-2099 decadal mean gamma value, is produced in `GenerateFullRedistTempTimeseries.m`. Generating the full timeseries will require the full, 4D fields.
 * `grid_data_areas_masks.mat` contains data pertaining to the ORCA1 grid: longitudes, latitudes,grid cell volumes, masks for ocean basins, etc.
 * `section_location_76pt.mat` contains data identifying the location of the RAPID array.
+* `KrS_merged.mat` contains the global effective kappa_r^S field. This is the merged estimate from the one and two step estimations, and has been calculated by estimating the 2090's decadal mean redistributed salinity before dividing by the 2090's mean adjusted natural carbon to obtain a kappa_r^S field entirely relative to adjusted natural carbon.
 
 .m files contain scripts and functions which allow the user to generate estimates of kappa_r, gamma (the correction factor for outgassing), estimates of excess and redistributed temperature, and to peruse some of the calculations made in the paper. To fully reproduce the results in the paper, the full 4D fields are necessary: please get in touch if you would like these fields.
 
