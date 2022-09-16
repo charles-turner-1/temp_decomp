@@ -1,7 +1,8 @@
 # Kappa_r Temperature Decomposition.
 
 This contains the MATLAB code to compute an estimate of kappa_r, along with the uncertainty on the estimate.
-It also contains a number of scripts which will generate sample fields as a supplement to the paper (DOI here).
+It also contains a number of scripts which will generate sample fields as a supplement to the paper ([DOI](https://doi.org/10.5194/os-18-523-2022
+)).
 
 .mat files contain sample data: these have been restricted to a single point in time for the gamma calculation and an array of grid cells approximating the location of the real world RAPID array for the full 240 year time series due to file size contraints. Please contact me if you wish to run the sample analyses on the full dataset.
 * `KappaRandPolyfit.mat` contains a global Kr field, along with ordinary least squares fits of dT/dCnat at each point. These fields are generated in the script `computeGlobalappaRValues.m`.
